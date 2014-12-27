@@ -2,25 +2,31 @@
 // Application Entry Point
 //////////////////////////////////////
 #include "./Engine.h"
+#include "./Data/include/OPsharedLibrary.h"
+
+typedef void (*pf)();
+OPsharedLibrary* gameCode;
+OPsharedLibrarySymbol* init;
+OPsharedLibrarySymbol* update;
 
 //////////////////////////////////////
 // Application Methods
 //////////////////////////////////////
 
 void ApplicationInit() {
-	OPchar* assetDir = NULL;
-#ifdef OPIFEX_REPO
-	assetDir = OPIFEX_ASSETS;
-#endif
-	OPloadersAddDefault();
-	OPcmanInit(assetDir);
 
-	OPrenderInit();
+	gameCode = OPsharedLibraryLoad("/Users/garretthoofman/shared.library/libShared.dylib");
+	if(gameCode == NULL) exit(1);
+
+	init = OPsharedLibraryLoadSymbol(gameCode, "GameInit");
+	update = OPsharedLibraryLoadSymbol(gameCode, "GameUpdate");
+	((pf)init->Symbol)();
 }
 
 int ApplicationUpdate(OPtimer* timer) {
-	OPrenderClear(0,0,0);
-	OPrenderPresent();
+	OPsharedLibraryReload(gameCode);
+
+	((pf)update->Symbol)();
 	return 0;
 }
 
