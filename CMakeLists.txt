@@ -50,7 +50,6 @@ add_external_opifex_includes()
 
 add_library(Shared SHARED ${SHARED_SRC})
 add_opifex_libraries(Shared)
-add_definitions(-dylib -undefined dynamic_lookup)
 
 
 opifex_engine_status_messages()
